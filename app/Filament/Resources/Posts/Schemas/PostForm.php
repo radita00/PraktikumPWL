@@ -33,13 +33,24 @@ class PostForm
                         // 2 KOLOM UTAMA
                         Group::make([
                             TextInput::make('title')
-                                ->required(),
+                                ->rules(["required", "min:3", "max:10"])
+                                ->maxLength(255)
+                                ->validationMessages([
+                            'unique' => 'judul minimal 3 karakter, maksimal 10 karakter.',
+                            ]),
 
-                            TextInput::make('slug'),
+                            TextInput::make('slug')
+                            ->rules(["required", "min:3"])
+                            ->unique()
+                            ->validationMessages([
+                            'unique' => 'Slug harus unik dan tidak boleh sama.',
+                            ]),
 
                             Select::make('category_id')
                                 ->relationship('category', 'name')
-                                ->searchable(),
+                                ->searchable()
+                                ->required()
+                                ->preload(),
 
                             ColorPicker::make('color'),
                         ])->columns(2),
@@ -60,6 +71,7 @@ class PostForm
                         ->icon('heroicon-o-photo')
                         ->schema([
                             FileUpload::make('image')
+                                ->required()
                                 ->disk('public')
                                 ->directory('post'),
                         ]),
